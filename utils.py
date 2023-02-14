@@ -6,7 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
 
-"""получает сервис по api"""
+"""получает сервис по api!"""
 def get_service():
     load_dotenv(find_dotenv())
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
