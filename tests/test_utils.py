@@ -12,6 +12,11 @@ def channel():
     return Channel(ch_id='UCMCgOm8GZkHp8zJ6l7_hIuA')
 
 
+def test_str(channel):
+    """тестирует СТР"""
+    assert channel.__str__() == "вДудь"
+
+
 def test_title(channel):
     """тестирует геттер title"""
     assert channel.title == 'вДудь'
