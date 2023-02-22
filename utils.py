@@ -24,6 +24,21 @@ class Channel:
         self.__ch_info = get_service().channels().list(id=ch_id, part='snippet,statistics').execute()
         self.__title = self.title
 
+    def __str__(self) -> str:
+        """Выводит название канала"""
+        return f'{self.title}'
+
+    def __add__(self, other) -> int:
+        """Складывет кол-во подписчиков"""
+        return print(self.subs + other.subs)
+
+    def __lt__(self, other) -> str:
+        """Сравнивает количетсво подписчиков"""
+        if self.subs > other.subs:
+            return True
+        else:
+            return False
+
     def to_json(self, filename):
         """Отправляет информацию в джисон"""
         channel_id = self.ch_id
@@ -72,3 +87,4 @@ class Channel:
         channel_id = self.ch_id
         channel = get_service().channels().list(id=channel_id, part='snippet,statistics').execute()
         print(channel)
+
