@@ -2,6 +2,7 @@ import os
 from googleapiclient.discovery import build
 import json
 from dotenv import load_dotenv, find_dotenv
+from googleapiclient.discovery import *
 
 """скрываю АПИ"""
 load_dotenv(find_dotenv())
@@ -87,4 +88,60 @@ class Channel:
         channel_id = self.ch_id
         channel = get_service().channels().list(id=channel_id, part='snippet,statistics').execute()
         print(channel)
+
+class Video:
+
+    def __init__(self, id):
+        self.id = id
+        self.__video_info = get_service().videos().list(id=id, part='snippet,statistics').execute()
+
+    def print_info(self):
+        """выводит инфу о видео"""
+        video_id = self.id
+        channel = get_service().videos().list(id = video_id, part='snippet,statistics').execute()
+        print(channel)
+
+    @property
+    def title(self) -> str:
+        """Геттер title"""
+        video_title = self.__video_info.get('items')[0].get('snippet').get('title')
+        return video_title
+
+    def __str__(self) -> str:
+        """Выводит название видео"""
+        return f'{self.title}'
+
+    @property
+    def views(self) -> int:
+        """Геттер views"""
+        video_views = self.__video_info.get('items')[0].get('statistics').get('viewCount')
+        return video_views
+
+    @property
+    def likes(self) -> int:
+        """Геттер likes"""
+        video_likes = self.__video_info.get('items')[0].get('statistics').get('likeCount')
+        return video_likes
+
+class PLVideo(Video):
+
+    def __init__(self, id, id_playlist):
+        super().__init__(id)
+        self.id_playlist = id_playlist
+        self.__playlist_info = get_service().playlists().list(id=id_playlist, part='snippet').execute()
+
+    def __str__(self):
+        return f'{super().title} ({self.playlist_name})'
+
+    def print(self):
+        """выводит инфу о видео"""
+        id_playlist = self.id_playlist
+        playlist = get_service().playlists().list(id=id_playlist, part='snippet').execute()
+        print(playlist)
+
+    @property
+    def playlist_name(self):
+        playlist_title = self.__playlist_info.get('items')[0].get('snippet').get('title')
+        return playlist_title
+
 
