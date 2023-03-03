@@ -1,6 +1,8 @@
-import os
-from googleapiclient.discovery import build
+import datetime
 import json
+import os
+
+import isodate
 from dotenv import load_dotenv, find_dotenv
 from googleapiclient.discovery import *
 
@@ -78,7 +80,7 @@ class Channel:
         return channel_videos
 
     @property
-    def views(self):
+    def views(self) -> int:
         """Геттер views"""
         channel_views = self.__ch_info.get('items')[0].get('statistics').get('viewCount')
         return channel_views
@@ -89,6 +91,7 @@ class Channel:
         channel = get_service().channels().list(id=channel_id, part='snippet,statistics').execute()
         print(channel)
 
+
 class Video:
 
     def __init__(self, id):
@@ -98,7 +101,7 @@ class Video:
     def print_info(self):
         """выводит инфу о видео"""
         video_id = self.id
-        channel = get_service().videos().list(id = video_id, part='snippet,statistics').execute()
+        channel = get_service().videos().list(id=video_id, part='snippet,statistics').execute()
         print(channel)
 
     @property
@@ -123,6 +126,7 @@ class Video:
         video_likes = self.__video_info.get('items')[0].get('statistics').get('likeCount')
         return video_likes
 
+
 class PLVideo(Video):
 
     def __init__(self, id, id_playlist):
@@ -140,8 +144,83 @@ class PLVideo(Video):
         print(playlist)
 
     @property
-    def playlist_name(self):
+    def playlist_name(self) -> str:
+        """Выводит название плейлиста"""
         playlist_title = self.__playlist_info.get('items')[0].get('snippet').get('title')
         return playlist_title
 
 
+class PlayList:
+
+    def __init__(self, id):
+        self.playlist_info = get_service().playlists().list(id=id, part='snippet').execute()
+        self.playlist_video_info = get_service().playlistItems().list(playlistId=id, part='snippet,contentDetails',
+                                                                      maxResults=50)
+        self.video_info = get_service().videos().list(id=id, part='snippet,statistics,contentDetails').execute()
+        self.id = id
+
+    @property
+    def url(self):
+        """выводит ссылку"""
+        return (f'https://www.youtube.com/playlist?list={self.id}')
+
+    @property
+    def title(self):
+        """Выводит название"""
+        playlist_title = self.playlist_info.get('items')[0].get('snippet').get('title')
+        return playlist_title
+
+    @property
+    def get_ids(self):
+        """получает список из id"""
+        next_page = True
+        ids_list = []
+        while next_page:
+            response = self.playlist_video_info.execute()
+            data = response['items']
+            for video in data:
+                video_id = video['contentDetails']['videoId']
+                if video_id not in ids_list:
+                    ids_list.append(video_id)
+
+            if 'nextPageToken' in response.keys():
+                next_page = True
+                self.playlist_video_info = get_service().playlistItems().list(
+                    playlistId=id,
+                    part='snippet,contentDetails',
+                    maxResults=50,
+                    pageToken=response['nextPageToken']
+                ).execute()
+            else:
+                next_page = False
+        return ids_list
+
+    @property
+    def total_duration(self):
+        """выводит общее время плейлиста"""
+        total_duration = datetime.timedelta(seconds=0)
+        list_of_ids = self.get_ids
+
+        for video in list_of_ids:
+            video_list = get_service().videos().list(id=video, part='snippet,statistics,contentDetails').execute()
+            duration = video_list.get('items')[0].get('contentDetails').get('duration')
+            normal_duration = isodate.parse_duration(duration)
+            total_duration += normal_duration
+        return total_duration
+
+    def show_best_video(self):
+        """Вывожу ссылку на самое популярное видео"""
+        list_of_ids = self.get_ids
+
+        most = ''
+        count = 0
+
+        for video in list_of_ids:
+            video_list = get_service().videos().list(id=video, part='snippet,statistics,contentDetails').execute()
+            likes = video_list.get('items')[0].get('statistics').get('likeCount')
+            likes_fix = int(likes)
+            if likes_fix > count:
+                count = likes_fix
+                most = video
+
+        return f'https://youtu.be/{most}'
