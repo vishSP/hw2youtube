@@ -21,6 +21,7 @@ httplib2==0.21.0
 idna==3.4
 importlib-metadata==6.0.0
 iniconfig==2.0.0
+isodate==0.6.1
 jaraco.classes==3.2.3
 jsonschema==4.17.3
 keyring==23.13.1
