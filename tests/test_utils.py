@@ -26,6 +26,11 @@ def playList():
     return PlayList(id='PLguYHBi01DWr4bRWc4uaguASmo7lW4GCb')
 
 
+@pytest.fixture
+def video_error():
+    return Video(id='broken_video_id')
+
+
 def test_str(channel):
     """тестирует СТР"""
     assert channel.__str__() == "вДудь"
@@ -87,3 +92,10 @@ def test_total_duration(playList):
 
 def test_show_best_video(playList):
     assert playList.show_best_video() == "https://youtu.be/9Bv2zltQKQA"
+
+
+def test_broken_video(video_error):
+    assert video_error.title is None
+    assert video_error.likes is None
+    assert video_error.views is None
+
