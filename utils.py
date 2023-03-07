@@ -234,7 +234,3 @@ class PlayList:
                 most = video
 
         return f'https://youtu.be/{most}'
-
-broken_video = Video('broken_video_id')
-print(broken_video.title)
-print(broken_video.likes)
