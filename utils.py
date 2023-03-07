@@ -107,7 +107,10 @@ class Video:
     @property
     def title(self) -> str:
         """Геттер title"""
-        video_title = self.__video_info.get('items')[0].get('snippet').get('title')
+        try:
+            video_title = self.__video_info.get('items')[0].get('snippet').get('title')
+        except:
+            return None
         return video_title
 
     def __str__(self) -> str:
@@ -117,13 +120,20 @@ class Video:
     @property
     def views(self) -> int:
         """Геттер views"""
-        video_views = self.__video_info.get('items')[0].get('statistics').get('viewCount')
+        try:
+            video_views = self.__video_info.get('items')[0].get('statistics').get('viewCount')
+        except:
+            return None
         return video_views
 
     @property
     def likes(self) -> int:
         """Геттер likes"""
-        video_likes = self.__video_info.get('items')[0].get('statistics').get('likeCount')
+        try:
+            video_likes = self.__video_info.get('items')[0].get('statistics').get('likeCount')
+        except:
+            return None
+
         return video_likes
 
 
@@ -224,3 +234,7 @@ class PlayList:
                 most = video
 
         return f'https://youtu.be/{most}'
+
+broken_video = Video('broken_video_id')
+print(broken_video.title)
+print(broken_video.likes)
